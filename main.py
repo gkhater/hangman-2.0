@@ -49,7 +49,7 @@ def get_guess_input_(valid_letters, isGuesser):
 
 def run_game(tries, word, isGuesser): 
     won = False
-    valid_letters = set(set(string.ascii_lowercase))
+    valid_letters = set(string.ascii_lowercase)
     guess_word = list("*"*len(word))
 
     while tries > 0 : 
