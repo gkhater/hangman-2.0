@@ -14,7 +14,8 @@ def main(statistics = True):
     else: 
         tries = 32 #unlimited guesses since machine plays against itself
         word = get_word_input(True) #machine generates word
-        run_game(tries, word, False) #machine guesses the word 
+        print(f"--- {word} ---")
+        run_game(tries,word, False) #machine guesses the word 
     
     return
 
@@ -32,7 +33,7 @@ def get_role_input():
 
 def get_word_input(isGuesser): 
     if isGuesser: 
-        return random.choice(word_list)
+        return random.choice(word_list).lower()
      
     while True:
         user_input = input("Please enter your word: ").lower()
@@ -56,30 +57,41 @@ def run_game(tries, word, isGuesser):
     won = False
     valid_letters = set(string.ascii_lowercase)
     guess_word = list("*"*len(word))
-    short_list = [match for match in word_list if len(match) == len(word)]
+    short_list = [match.lower() for match in word_list if len(match) == len(word)]
 
     while tries > 0 : 
         print(f"{''.join(guess_word)} \n")
         guess = get_guess_input_(valid_letters, isGuesser, guess_word, short_list)
         valid_letters.remove(guess)
+        indexes = []
 
         if guess not in word: 
             tries -= 1
             print(f"{guess} not in word, you have {tries} tries left ")
             
             if not isGuesser: 
-               for element in short_list: 
-                    if guess in element: 
-                        short_list.remove(element)
+                i = 0 
+                while i < len(short_list):
+                    if guess in short_list[i]: 
+                        short_list.pop(i)
+                    else: 
+                        i += 1
         else:  
-            for letter_index in range(len(word)): 
-                if word[letter_index] == guess: 
-                        guess_word[letter_index] = guess
+            indexes = [index for index, char in enumerate(word) if char == guess]
+            for i in indexes: 
+                guess_word[i] = guess
 
             if not isGuesser: 
-                for element in short_list: 
+                i = 0 
+                while i < len(short_list):
+                    element = short_list[i]
                     if guess not in element: 
-                        short_list.remove(element)
+                        short_list.pop(i)
+                    else: 
+                        if [index for index, char in enumerate(element) if char == guess] != indexes: #check if the position(s) of the guessed letter don't  match
+                            short_list.pop(i)
+                        else: #if list remains unchanged
+                            i += 1
 
             if ''.join(guess_word) == word:
                 tries = 0
@@ -92,4 +104,5 @@ def run_game(tries, word, isGuesser):
 
         
 if __name__ == "__main__": 
-    main()
+    while True: 
+        main()
