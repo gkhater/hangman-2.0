@@ -1,15 +1,20 @@
 import random
-import nltk
-from nltk.corpus import words
+from Proba import word_list, get_max_proba
 import string
 
 
-def main(): 
-    isGuesser = get_role_input()
-    tries = 7 
+def main(statistics = True): 
+    if not statistics: 
+        isGuesser = get_role_input()
+        tries = 7 
 
-    word = get_word_input(isGuesser)
-    run_game(tries, word, isGuesser)
+        word = get_word_input(isGuesser)
+        run_game(tries, word, isGuesser)
+    
+    else: 
+        tries = 32 #unlimited guesses since machine plays against itself
+        word = get_word_input(True) #machine generates word
+        run_game(tries, word, False) #machine guesses the word 
     
     return
 
@@ -36,35 +41,45 @@ def get_word_input(isGuesser):
         else: 
             print("Invalid word, Please try another")
 
-def get_guess_input_(valid_letters, isGuesser): 
+def get_guess_input_(valid_letters, isGuesser, word, short_list): 
     if not isGuesser: 
-        return
-    
-    while True: 
-        user_input = input("Please enter your guess: ").lower()
-        if len(user_input) == 1 and user_input in valid_letters:  
-            return user_input
-        else: 
-            print("invalid guess")
+        return get_max_proba(word, short_list, valid_letters)
+    else: 
+        while True: 
+            user_input = input("Please enter your guess: ").lower()
+            if len(user_input) == 1 and user_input in valid_letters:  
+                return user_input
+            else: 
+                print("invalid guess")
 
 def run_game(tries, word, isGuesser): 
     won = False
     valid_letters = set(string.ascii_lowercase)
     guess_word = list("*"*len(word))
+    short_list = [match for match in word_list if len(match) == len(word)]
 
     while tries > 0 : 
         print(f"{''.join(guess_word)} \n")
-        guess = get_guess_input_(valid_letters, isGuesser)
+        guess = get_guess_input_(valid_letters, isGuesser, guess_word, short_list)
         valid_letters.remove(guess)
 
         if guess not in word: 
             tries -= 1
-            print(f"wrong, you have {tries} tries left ")
-
-        else: 
+            print(f"{guess} not in word, you have {tries} tries left ")
+            
+            if not isGuesser: 
+               for element in short_list: 
+                    if guess in element: 
+                        short_list.remove(element)
+        else:  
             for letter_index in range(len(word)): 
                 if word[letter_index] == guess: 
-                    guess_word[letter_index] = guess
+                        guess_word[letter_index] = guess
+
+            if not isGuesser: 
+                for element in short_list: 
+                    if guess not in element: 
+                        short_list.remove(element)
 
             if ''.join(guess_word) == word:
                 tries = 0
@@ -77,6 +92,4 @@ def run_game(tries, word, isGuesser):
 
         
 if __name__ == "__main__": 
-    nltk.download("words")
-    word_list = words.words()
     main()
