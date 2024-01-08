@@ -8,13 +8,8 @@ def main():
     isGuesser = get_role_input()
     tries = 7 
 
-    if isGuesser: 
-        word = random.choice(word_list)
-        do_prompter(tries, word)
-
-    else: 
-        word = get_word_input()
-        do_guesser(tries, word)
+    word = get_word_input(isGuesser)
+    run_game(tries, word, isGuesser)
     
     return
 
@@ -30,15 +25,21 @@ def get_role_input():
         else:
             print("Invalid input. Please enter 'Y', 'N', or 'R'.")
 
-def get_word_input(): 
-     while True:
+def get_word_input(isGuesser): 
+    if isGuesser: 
+        return random.choice(word_list)
+     
+    while True:
         user_input = input("Please enter your word: ").lower()
         if user_input in word_list: 
             return user_input
         else: 
             print("Invalid word, Please try another")
 
-def get_guess_input_(valid_letters): 
+def get_guess_input_(valid_letters, isGuesser): 
+    if not isGuesser: 
+        return
+    
     while True: 
         user_input = input("Please enter your guess: ").lower()
         if len(user_input) == 1 and user_input in valid_letters:  
@@ -46,14 +47,14 @@ def get_guess_input_(valid_letters):
         else: 
             print("invalid guess")
 
-def do_prompter(tries, word): 
+def run_game(tries, word, isGuesser): 
     won = False
     valid_letters = set(set(string.ascii_lowercase))
     guess_word = list("*"*len(word))
 
     while tries > 0 : 
         print(f"{''.join(guess_word)} \n")
-        guess = get_guess_input_(valid_letters)
+        guess = get_guess_input_(valid_letters, isGuesser)
         valid_letters.remove(guess)
 
         if guess not in word: 
@@ -75,11 +76,6 @@ def do_prompter(tries, word):
         print(f"You are out of tries, you have lost, the word was: {word}")        
 
         
-
-def do_guesser(tries, word): 
-    pass
-
-
 if __name__ == "__main__": 
     nltk.download("words")
     word_list = words.words()
