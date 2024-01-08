@@ -6,8 +6,8 @@ import string
 nltk.download("words")
 word_list = words.words()
 
-def get_all_probas(word): 
-    short_list = [match for match in word_list if len(match) == len(word)]
+def get_all_probas(word, short_list): 
+    
     alphabet = tuple(string.ascii_lowercase)
 
     probas = dict()
@@ -26,6 +26,7 @@ def get_letter_proba(letter, short_list):
 
     return count/total
 
-def get_max_proba(word): 
-    probas = get_all_probas(word)
+def get_max_proba(word, short_list): 
+    probas = get_all_probas(word, short_list)
     return max(probas, key = probas.get)
+
