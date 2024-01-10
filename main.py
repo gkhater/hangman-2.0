@@ -128,7 +128,7 @@ def run_game(tries, word, isGuesser):
 if __name__ == "__main__": 
     dump_data = dict()
 
-    for i in range(10**2): 
+    for i in range(10**4): 
         word, won, sequence, used = main()
         game_id, game_data = collect_game_data(word, won, sequence, used)
 
