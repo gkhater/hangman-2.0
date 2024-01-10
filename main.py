@@ -1,6 +1,9 @@
-import random
+
 from Proba import word_list, get_max_proba
+from Data_collection import collect_game_data
+import random
 import string
+
 
 
 def main(statistics = True): 
@@ -15,9 +18,9 @@ def main(statistics = True):
         tries = 32 #unlimited guesses since machine plays against itself
         word = get_word_input(True) #machine generates word
         print(f"--- {word} ---")
-        run_game(tries,word, False) #machine guesses the word 
+        won, sequence = run_game(tries,word, False) #machine guesses the word 
     
-    return
+    return word, won, sequence
 
 def get_role_input():
     while True:
@@ -59,13 +62,22 @@ def run_game(tries, word, isGuesser):
     guess_word = list("*"*len(word))
     short_list = [match.lower() for match in word_list if len(match) == len(word)]
 
+    #keeps tract of the state sequence of the game
+    #used for data_collection
+    sequence = []
+
     while tries > 0 : 
         print(f"{''.join(guess_word)} \n")
         guess = get_guess_input_(valid_letters, isGuesser, guess_word, short_list)
         valid_letters.remove(guess)
         indexes = []
 
+        sequence.append({"letter" : guess})
+    
+
         if guess not in word: 
+            sequence[-1]["correct"] = False
+
             tries -= 1
             print(f"{guess} not in word, you have {tries} tries left ")
             
@@ -77,6 +89,8 @@ def run_game(tries, word, isGuesser):
                     else: 
                         i += 1
         else:  
+            sequence[-1]["correct"] = True
+
             indexes = [index for index, char in enumerate(word) if char == guess]
             for i in indexes: 
                 guess_word[i] = guess
@@ -96,12 +110,15 @@ def run_game(tries, word, isGuesser):
             if ''.join(guess_word) == word:
                 tries = 0
                 won = True
+        
+        sequence[-1]["state sequence"] = guess_word
     
     if won: 
         print(f"Congratulations, you have won, the word was: {word}")
     else: 
-        print(f"You are out of tries, you have lost, the word was: {word}")        
+        print(f"You are out of tries, you have lost, the word was: {word}")  
 
+    return won       
         
 if __name__ == "__main__": 
     while True: 
