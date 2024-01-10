@@ -4,13 +4,15 @@ import uuid
 def collect_game_data(target_word, result, sequence): 
     game_id = generate_game_id()
 
-    return {
-         game_id : {
-              "Target word"     : target_word, 
-              "Game Result "        : result, 
-              "Game evolution"  : sequence
-         }
-    }
+    game_data = {
+        "Target word"     : target_word, 
+        "Game Result "    : result, 
+        "Game evolution"  : sequence
+        }
+
+    return game_id, game_data
+    
+         
 
 def generate_game_id():
     # Generate a random UUID and convert it to a string
