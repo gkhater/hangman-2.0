@@ -3,6 +3,7 @@ from Proba import word_list, get_max_proba
 from Data_collection import collect_game_data
 import random
 import string
+import json
 
 
 
@@ -18,9 +19,9 @@ def main(statistics = True):
         tries = 32 #unlimited guesses since machine plays against itself
         word = get_word_input(True) #machine generates word
         print(f"--- {word} ---")
-        won, sequence = run_game(tries,word, False) #machine guesses the word 
+        won, sequence, used = run_game(tries,word, False) #machine guesses the word 
     
-    return word, won, sequence
+    return word, won, sequence, used
 
 def get_role_input():
     while True:
@@ -108,18 +109,32 @@ def run_game(tries, word, isGuesser):
                             i += 1
 
             if ''.join(guess_word) == word:
+                used = 32 - tries
                 tries = 0
                 won = True
+                
+        sequence[-1]["state sequence"] = ''.join(guess_word)
+        print(f"guess word: {sequence[-1]['state sequence']}")
         
-        sequence[-1]["state sequence"] = guess_word
+        
     
     if won: 
         print(f"Congratulations, you have won, the word was: {word}")
     else: 
         print(f"You are out of tries, you have lost, the word was: {word}")  
 
-    return won       
+    return won, sequence, used    
         
 if __name__ == "__main__": 
-    while True: 
-        main()
+    dump_data = dict()
+
+    for i in range(10**2): 
+        word, won, sequence, used = main()
+        game_id, game_data = collect_game_data(word, won, sequence, used)
+
+        dump_data[game_id] = game_data
+
+    with open('Data.json', 'w') as file: 
+        json.dump(dump_data, file, indent=4)
+
+

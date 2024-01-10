@@ -1,12 +1,12 @@
-import json
 import uuid
 
-def collect_game_data(target_word, result, sequence): 
+def collect_game_data(target_word, result, sequence, tries): 
     game_id = generate_game_id()
 
     game_data = {
         "Target word"     : target_word, 
         "Game Result "    : result, 
+        "Tries used"      :tries, 
         "Game evolution"  : sequence
         }
 
