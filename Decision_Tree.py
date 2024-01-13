@@ -9,6 +9,7 @@ Credit:
 
 
 Note: This is an educational implementation and may not reflect the performance optimizations of professional machine learning libraries.
+Note2: This tree has been tested on the iris dataset with ~90% accuracy, link to git repo will be included in the near future. 
 """
 
 import numpy as np
@@ -61,7 +62,7 @@ class DecisionTree():
                 right_tree = self.buildTree(split_data["right data"], curr_depth + 1)
 
                 #return subTree
-                return Node(split_data["feature_index"], split_data["treshold"], left_tree, right_tree, split_data["info gain"])
+                return Node(split_data["feature index"], split_data["treshold"], left_tree, right_tree, split_data["info gain"])
             
         value = self.get_leaf_value(Y)
         return Node(value=value)
@@ -80,17 +81,17 @@ class DecisionTree():
 
         best_split = dict() 
 
-        for feature_index in num_features: 
+        for feature_index in range(num_features): 
             #find all unique values for specific value
             feature_values = data[:,feature_index]
             possible_tresholds = np.unique(feature_values)
 
             #loop trough all possible tresholds to find the optimal one
             for treshold in possible_tresholds: 
-                left, right = self.split(data, treshold)
+                left, right = self.split(data, feature_index, treshold)
                 
                 #check if children datasets are not null
-                if left and right:
+                if len(left) > 0  and len(right) > 0:
                     #value in this case represents the difficulty
                     values, left_values, right_values = data[:,-1], left[:,-1], right[:,-1]
 
@@ -108,11 +109,11 @@ class DecisionTree():
         return best_split
 
                     
-    def split(self, data, treshold): 
-        left = [x for x in data if x <= treshold]
-        right = [x for x in data if x > treshold]
+    def split(self, data, feature_index, treshold): 
+        left = [x for x in data if x[feature_index] <= treshold]
+        right = [x for x in data if x[feature_index] > treshold]
 
-        return left, right
+        return np.array(left), np.array(right)
 
     def get_info_gain(self, values, left_values, right_values) -> int: 
         
@@ -129,15 +130,18 @@ class DecisionTree():
     def gini(values): 
         #returns the different types in our values (here the difficulties)
         types = np.unique(values)
-
+        gini = 0
         # iterates through all types, then takes the squared value of the type_frequency/number_of_values
          
-        squrd_probas = [(len([y == tp for y in values]) / len(values)) ** 2 for tp in types]
+        for tp in types: 
+            proba = len(values[values == tp]) / len(values)
+            gini += proba**2
 
-        return 1 - sum(squrd_probas)
+        return 1 - gini
     
     def get_leaf_value(self, values): 
         #returns the most common element in the leaf node
+        values = list(values)
         return max(values, key = values.count)
     
     def fit(self, X, Y): 
