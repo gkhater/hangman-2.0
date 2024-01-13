@@ -35,7 +35,7 @@ You should navigate to 'some_parent_directory' and then execute the test module 
 1. Open your terminal or command prompt.
 2. Navigate to 'some_parent_directory'. Use the command 'cd path/to/some_parent_directory'.
 3. Run the script with the command:
-   'python -m Hangman_2.0.Iris_testing.test_Decision_Tree'
+   'python -m Hangman_2.Iris_testing.test_Decision_Tree'
 
 This command tells Python to run 'test_Decision_Tree.py' as a module within the 'Hangman_2.0.Iris_testing' package.
 
@@ -49,7 +49,6 @@ Important Notes:
 - If using an IDE, configure it to recognize 'Hangman_2.0' as the project root.
 - This setup is crucial for maintaining a clear and scalable project structure, especially in larger or complex Python projects.
 """
-
 
 import pandas as pd 
 
