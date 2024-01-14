@@ -62,7 +62,7 @@ data = pd.read_csv('.\\Hangman_2\\Iris_testing\\iris_dataset.csv')
 X = data.iloc[:,:-1].values
 Y = data.iloc[:, -1].values.reshape(-1,1)
 
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.4)
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.2)
 
 tree = Decision_Tree.DecisionTree(min_split=3, max_depth=3)
 
