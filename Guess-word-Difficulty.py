@@ -154,19 +154,25 @@ def get_info(row):
     ]
 
 
-with open(csv_file, 'r') as input_csv:
-    csv_reader = csv.reader(input_csv)
-    
-    # Skip the header row
-    next(csv_reader)
-    
-    # Iterate through each row
-    for row in csv_reader:
-        difficulty = row[2] 
-        
-        if not difficulty: 
-            continue
-        
-        
-        info = get_info(row)
-        games_data.append(info)
+# Read the CSV file into a Pandas DataFrame
+df = pd.read_csv(csv_file)
+
+# Filter out rows with empty difficulty
+df = df[df['difficulty'].notna()]
+
+# Now, iterate through each row in the DataFrame and calculate the additional features
+for index, row in df.iterrows():
+    difficulty = row['difficulty']
+    info = get_info(row)
+    df.at[index, 'game_id'] = info[0]
+    df.at[index, 'word_to_guess'] = info[1]
+    df.at[index, 'word_length'] = info[2]
+    df.at[index, 'average_letter_frequency'] = info[3]
+    df.at[index, 'vowel_to_consonant_ratio'] = info[4]
+    df.at[index, 'word_frequency'] = info[5]
+    df.at[index, 'different_letters_ratio'] = info[6]
+    df.at[index, 'word_regularity'] = info[7]
+    df.at[index, 'difficulty'] = info[8]
+
+# games_data is now a DataFrame
+games_data = df
