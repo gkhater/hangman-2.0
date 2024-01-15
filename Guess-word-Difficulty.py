@@ -1,11 +1,14 @@
 import csv
 import nltk
 import pandas as pd
+import numpy as np 
+import math
 
 from Decision_Tree import DecisionTree
 from nltk.corpus import words, cmudict, reuters
 from collections import defaultdict
-import math
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 
 nltk.download("words")
@@ -120,7 +123,9 @@ def get_info(row):
 
         return total_frequency / word_length
     
-    game_id, word_to_guess, difficulty = row
+    game_id, word_to_guess, grade = row
+
+    difficulty = get_difficulty(grade)
 
     word_length = len(word_to_guess)
     average_letter_frequency = calculate_average_letter_frequency(word_to_guess)
@@ -150,19 +155,27 @@ def get_info(row):
         word_frequency, 
         different_letters_ratio, 
         word_regularity,
+        grade, 
         difficulty
     ]
 
+
+def get_difficulty(grade):
+    if grade < 5: 
+        return 'Easy'
+    elif grade < 8: 
+        return 'Medium'
+    else: 
+        return 'Hard' 
 
 # Read the CSV file into a Pandas DataFrame
 df = pd.read_csv(csv_file)
 
 # Filter out rows with empty difficulty
-df = df[df['difficulty'].notna()]
+df = df[df.iloc[:,2].notna()]
 
 # Now, iterate through each row in the DataFrame and calculate the additional features
 for index, row in df.iterrows():
-    difficulty = row['difficulty']
     info = get_info(row)
     df.at[index, 'game_id'] = info[0]
     df.at[index, 'word_to_guess'] = info[1]
@@ -172,7 +185,23 @@ for index, row in df.iterrows():
     df.at[index, 'word_frequency'] = info[5]
     df.at[index, 'different_letters_ratio'] = info[6]
     df.at[index, 'word_regularity'] = info[7]
-    df.at[index, 'difficulty'] = info[8]
+    df.at[index, 'grade'] = info[8]
+    df.at[index, 'difficulty'] = info[9]
 
-# games_data is now a DataFrame
-games_data = df
+df.drop(['Game ID', 'Word', 'Difficulty'], axis=1, inplace= True)
+
+X = df.drop(['game_id', 'word_to_guess', 'difficulty', 'grade'], axis=1).values
+grades = df['grade'].values.reshape(-1,1)
+difficulties = df['difficulty'].values.reshape(-1,1)
+
+X_train, X_test, grades_train, grades_test = train_test_split(X, grades, test_size = 0.2)
+
+tree = DecisionTree(min_split=3, max_depth=3)
+
+tree.fit(X_train, grades_train)
+grades_predictions = tree.predict(X_test)
+
+difficulty_predictions = [get_difficulty(x) for x in grades_predictions]
+difficulty_test        = [get_difficulty(x) for x in grades_test]
+
+print(accuracy_score(difficulty_test, difficulty_predictions))
